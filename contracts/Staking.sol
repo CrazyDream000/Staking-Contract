@@ -139,5 +139,8 @@ contract Staking is ReentrancyGuard {
         // Person A: 0 staked, Withdraw: 280
     }
 
-
+    // Getter for UI
+    function getStaked(address account) public view returns (uint256) {
+        return s_balances[account];
+    }
 }
