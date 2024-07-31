@@ -98,7 +98,15 @@ contract Staking is ReentrancyGuard {
         }
     }
 
-
+    function withdraw(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
+        s_balances[msg.sender] -= amount;
+        s_totalSupply -= amount;
+        // emit event
+        bool success = s_stakingToken.transfer(msg.sender, amount);
+        if (!success) {
+            revert Withdraw__TransferFailed();
+        }
+    }
 
 
 
