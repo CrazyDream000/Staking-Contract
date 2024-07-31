@@ -108,7 +108,36 @@ contract Staking is ReentrancyGuard {
         }
     }
 
-
+    function claimReward() external updateReward(msg.sender) {
+        uint256 reward = s_rewards[msg.sender];
+        bool success = s_rewardToken.transfer(msg.sender, reward);
+        if (!success) {
+            revert Staking__TransferFailed();
+        }
+        // contract emits X reward tokens per second
+        // disperse tokens to all token stakers
+        // reward emission != 1:1
+        // MATH
+        // @ 100 tokens / second
+        // @ Time = 0
+        // Person A: 80 staked
+        // Preson B: 20 staked
+        // @ Time = 1
+        // Person A: 80 staked, Earned: 80, Withdraw 0
+        // Perosn B: 20 staked, Earned: 20, Withdraw: 0
+        // @ Time = 2
+        // Person A: 80 staked, Earned: 160, Withdraw 0
+        // Person B: 20 staked, Earned: 40, Withdraw: 0
+        // @ Time = 3
+        // New person enters!
+        // staked 100
+        // Person A: 80 staked, Earned 240 + (80/200 * 100) => (40), Withdraw 0
+        // Perosn B: 20 staked, Earned: 60 + (20/200 * 100) => (10), Withdraw 0
+        // Person C: 100 staked, Earned: 50, Withdraw 0
+        // @ Time = 4
+        // Person A Withdraws & claimed rewards on everything!
+        // Person A: 0 staked, Withdraw: 280
+    }
 
 
 }
