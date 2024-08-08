@@ -72,7 +72,16 @@ contract Staking is ReentrancyGuard {
         return _earned;
     }
 
-
+    /** @dev Basis of how long it's been during the most recent snapshot/block */
+    function rewardPerToken() public view returns (uint256) {
+        if (s_totalSupply == 0) {
+            return s_rewardPerTokenStored;
+        } else {
+            return
+                s_rewardPerTokenStored +
+                (((block.timestamp - s_lastUpdateTime) * REWARD_RATE * 1e18) / s_totalSupply);
+        }
+    }
 
     function stake(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
         // keep track of how much this user has staked
