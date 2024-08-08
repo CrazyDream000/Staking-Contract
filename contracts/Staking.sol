@@ -48,6 +48,12 @@ contract Staking is ReentrancyGuard {
         _;
     }
 
+    modifier moreThanZero(uint256 amount) {
+        if (amount == 0) {
+            revert Staking__NeedsMoreThanZero();
+        }
+        _;
+    }
 
  
 
