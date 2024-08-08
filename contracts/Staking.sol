@@ -48,40 +48,10 @@ contract Staking is ReentrancyGuard {
         _;
     }
 
-    modifier moreThanZero(uint256 amount) {
-        if (amount == 0) {
-            revert Staking__NeedsMoreThanZero();
-        }
-        _;
-    }
 
-    constructor(address stakingToken, address rewardToken) {
-        s_stakingToken = IERC20(stakingToken);
-        s_rewardToken = IERC20(rewardToken);
-    }
+ 
 
-    function earned(address account) public view returns (uint256) {
-        uint256 currentBalance = s_balances[account];
-        // how much they were paid already
-        uint256 amountPaid = s_userRewardPerTokenPaid[account];
-        uint256 currentRewardPerToken = rewardPerToken();
-        uint256 pastRewards = s_rewards[account];
-        uint256 _earned = ((currentBalance * (currentRewardPerToken - amountPaid)) / 1e18) +
-            pastRewards;
 
-        return _earned;
-    }
-
-    /** @dev Basis of how long it's been during the most recent snapshot/block */
-    function rewardPerToken() public view returns (uint256) {
-        if (s_totalSupply == 0) {
-            return s_rewardPerTokenStored;
-        } else {
-            return
-                s_rewardPerTokenStored +
-                (((block.timestamp - s_lastUpdateTime) * REWARD_RATE * 1e18) / s_totalSupply);
-        }
-    }
 
     function stake(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
         // keep track of how much this user has staked
