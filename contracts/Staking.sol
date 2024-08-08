@@ -55,7 +55,11 @@ contract Staking is ReentrancyGuard {
         _;
     }
 
- 
+    constructor(address stakingToken, address rewardToken) {
+        s_stakingToken = IERC20(stakingToken);
+        s_rewardToken = IERC20(rewardToken);
+    }
+
 
 
 
