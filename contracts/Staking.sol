@@ -60,6 +60,17 @@ contract Staking is ReentrancyGuard {
         s_rewardToken = IERC20(rewardToken);
     }
 
+    function earned(address account) public view returns (uint256) {
+        uint256 currentBalance = s_balances[account];
+        // how much they were paid already
+        uint256 amountPaid = s_userRewardPerTokenPaid[account];
+        uint256 currentRewardPerToken = rewardPerToken();
+        uint256 pastRewards = s_rewards[account];
+        uint256 _earned = ((currentBalance * (currentRewardPerToken - amountPaid)) / 1e18) +
+            pastRewards;
+
+        return _earned;
+    }
 
 
 
