@@ -66,7 +66,33 @@ contract Staking is ReentrancyGuard {
         uint256 amountPaid = s_userRewardPerTokenPaid[account];
         uint256 currentRewardPerToken = rewardPerToken();
         uint256 pastRewards = s_rewards[account];
- 100) => (10), Withdraw 0
+        uint256 _earned = ((currentBalance * (currentRewardPerToken - amountPaid)) / 1e18) +
+            pastRewards;
+
+        return _earned;
+    }
+
+    /** @dev Basis of how long it's been during the most recent snapshot/block */
+    function rewardPerToken() public view returns (uint256) {
+        if (s_totalSupply == 0) {
+            return s_rewardPerTokenStored;
+        } else {
+            return
+                s_rewardPerTokenStored +
+                (((block.timestamp - s_lastUpdateTime) * REWARD_RATE * 1e18) / s_totalSupply);
+        }
+    }
+
+    function stake(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
+        // keep track of how much this user has staked
+
+        // Person A: 80 staked, Earned: 160, Withdraw 0
+        // Person B: 20 staked, Earned: 40, Withdraw: 0
+        // @ Time = 3
+        // New person enters!
+        // staked 100
+        // Person A: 80 staked, Earned 240 + (80/200 * 100) => (40), Withdraw 0
+        // Perosn B: 20 staked, Earned: 60 + (20/200 * 100) => (10), Withdraw 0
         // Person C: 100 staked, Earned: 50, Withdraw 0
         // @ Time = 4
         // Person A Withdraws & claimed rewards on everything!
