@@ -83,6 +83,20 @@ contract Staking is ReentrancyGuard {
         }
     }
 
+    function stake(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
+        // keep track of how much this user has staked
+        // keep track of how much token we have total
+        // transfer the tokens to this contract
+        /** @notice Be mindful of reentrancy attack here */
+        s_balances[msg.sender] += amount;
+        s_totalSupply += amount;
+        //emit event
+        bool success = s_stakingToken.transferFrom(msg.sender, address(this), amount);
+        // require(success, "Failed"); Save gas fees here
+        if (!success) {
+            revert Staking__TransferFailed();
+        }
+    }
 
     function withdraw(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
         s_balances[msg.sender] -= amount;
